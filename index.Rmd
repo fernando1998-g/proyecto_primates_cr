@@ -1,0 +1,72 @@
+---
+title: "Proyecto Primates"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###### imagen ilustrativa
+![](https://images.unsplash.com/photo-1590324493291-747afe32ff58?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=751&q=80)  
+[White fronted capuchin monkey by Berend Leupen](https://unsplash.com/photos/hbHKEB5m2xE)
+
+# Preparativos
+```{r Carga, message=FALSE, warning=FALSE}
+# Carga de Paquetes
+library(dplyr)
+library(sf)
+library(DT)
+library(plotly)
+library(leaflet)
+library(tidyverse)
+```
+
+```{r carga-datos}
+# Carga de Datos
+# Registros de presencia de los primates
+primates_doc <-
+  st_read(
+    "C:/Users/User/Desktop/UNIVERSIDAD/GEOGRAFIA/4) I- 2021 (semestre III)/Procesamiento de Datos Geograficos/tareas/05 Tarea 03 (Primates)/Proyecto_Primates/Proyecto_Primates/primates-cr-registros.csv",
+    options = c(
+      "X_POSSIBLE_NAMES=decimalLongitude",
+      "Y_POSSIBLE_NAMES=decimalLatitude"
+    ),
+    quiet = TRUE
+  )
+
+# Asignación de CRS
+st_crs(primates_doc) = 4326
+
+#Cargando tabla de cantones
+# Capa geespacial de cantones
+cantones <-
+  st_read(
+    "https://raw.githubusercontent.com/gf0604-procesamientodatosgeograficos/2021i-datos/main/ign/delimitacion-territorial-administrativa/cr_cantones_simp_wgs84.geojson",
+    quiet = TRUE
+  )
+```
+
+```{r cruce-datos, message=FALSE, warning=FALSE}
+# Cruce espacial con la tabla de cantones, para obtener el nombre del cantón
+primates_doc <- 
+  primates_doc %>%
+  st_join(cantones["canton"])
+```
+
+###### imagen ilustrativa
+![](https://images.unsplash.com/photo-1494880941996-d7a467852c4a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=751&q=80)  
+[Playa Manuel Antonio by Isabella Jusková](https://unsplash.com/photos/G9M6Cjqw5To)  
+
+# Introducción  
+En Costa Rica existen cuatro especies de monos: **Congo o Aullador, Carablanca, Tití o Ardilla y Araña o Colorado.** Sin embargo, los biólogos advierten que urgen estrategias de conservación para seguir disfrutando de estos animales, claves para la industria turística. En términos económicos, los monos son una de las principales atracciones de los parques nacionales Manuel Antonio y Cahuita. Los turistas extranjeros viajan cientos de kilómetros a Costa Rica para observarlos, y los nacionales también se sienten cautivados por estos primates. En contraparte, la interacción con los humanos ha derivado -según los científicos- en una serie de situaciones perjudiciales para los monos, cuyas poblaciones se han visto diezmadas tanto en su abundancia como en su distribución. La pérdida y fragmentación del hábitat, la urbanización y la tala de los bosques ponen en peligro la conservación de estos mamíferos. Se han hecho proyecciones sobre la cantidad existente, ya que es imposible contar con un censo nacional. **En 2009, se calculó en 104 000 la cantidad de especímenes restantes de las cuatro especies que habitan el territorio nacional.** La fragmentación del hábitat causa una disminución en la cantidad de monos y aumenta la probabilidad de endogamia, es decir, la posibilidad de que un individuo se cruce con otros emparentados con él y se produzca una combinación de los mismos genes. Por otro lado, con la fragmentación de los bosques también se pierde la conectividad entre las áreas, aspecto fundamental para el desplazamiento de las tropas. “La deforestación, con o sin permiso, sigue siendo un problema, porque le cortamos el movimiento a los monos”, advirtió el investigador. Por todo lo anterio, una posible solución es la creación de corredores biológicos y la protección de las cuencas hidrográficas para establecer la conectividad necesaria, lo que favorecería el crecimiento de las poblaciones y que así se produzcan cruces de individuos entre distintas tropas, según expresó Sánchez. Finalmente, Wong insiste en fomentar la educación ambiental para que la gente dé mayor importancia a la conservación de los monos y tome conciencia acerca de los servicios ambientales que brindan, entre estos el control de insectos y la dispersión de semilla y su valor para el turismo. (Universidad de Costa Rica,[La realidad de los monos](https://www.ucr.ac.cr/noticias/2019/05/08/la-realidad-de-los-monos-la-antesala-a-la-extincion.html)).
+
+# Tabla de Registros de presencia
+
+
+# Gráfico de estacionalidad
+
+# Gráfico de historial
+
+# Mapa de distribución
+
