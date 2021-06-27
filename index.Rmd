@@ -117,7 +117,7 @@ Gra_pie <-
 data <- Gra_pie[, c('categorie', 'species', 'individualCount')]
 ```
 
-```{r Grafico-Pastel, message=FALSE, warning=FALSE, echo=FALSE}
+```{r Grafico-Pastel, message=FALSE, warning=FALSE, echo=FALSE, fig.width=8, fig.height=8}
 plot_ly(
   data, 
   labels = ~species, 
@@ -163,7 +163,7 @@ palet <- colorNumeric(
 
 
 # Mapa de distribución
-```{r mapa, message=FALSE, warning=FALSE, echo=FALSE}
+```{r mapa, message=FALSE, warning=FALSE, echo=FALSE, fig.width=10, fig.height=6}
 # Mapa de registros de presencia
 primates_doc %>%
   dplyr::select(stateProvince,
