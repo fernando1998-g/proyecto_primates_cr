@@ -6,6 +6,7 @@ output: html_document
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+[Enlace al codigo fuente](https://github.com/fernando1998-g/proyecto_primates_cr)  
 
 ###### imagen ilustrativa
 ![](https://images.unsplash.com/photo-1590324493291-747afe32ff58?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=751&q=80)  
@@ -20,6 +21,7 @@ library(DT)
 library(plotly)
 library(leaflet)
 library(tidyverse)
+library(raster)
 ```
 
 ```{r carga-datos}
@@ -62,21 +64,195 @@ primates_doc <-
 En Costa Rica existen cuatro especies de monos: **Congo o Aullador, Carablanca, Tití o Ardilla y Araña o Colorado.** Sin embargo, los biólogos advierten que urgen estrategias de conservación para seguir disfrutando de estos animales, claves para la industria turística. En términos económicos, los monos son una de las principales atracciones de los parques nacionales Manuel Antonio y Cahuita. Los turistas extranjeros viajan cientos de kilómetros a Costa Rica para observarlos, y los nacionales también se sienten cautivados por estos primates. En contraparte, la interacción con los humanos ha derivado -según los científicos- en una serie de situaciones perjudiciales para los monos, cuyas poblaciones se han visto diezmadas tanto en su abundancia como en su distribución. La pérdida y fragmentación del hábitat, la urbanización y la tala de los bosques ponen en peligro la conservación de estos mamíferos. Se han hecho proyecciones sobre la cantidad existente, ya que es imposible contar con un censo nacional. **En 2009, se calculó en 104 000 la cantidad de especímenes restantes de las cuatro especies que habitan el territorio nacional.** La fragmentación del hábitat causa una disminución en la cantidad de monos y aumenta la probabilidad de endogamia, es decir, la posibilidad de que un individuo se cruce con otros emparentados con él y se produzca una combinación de los mismos genes. Por otro lado, con la fragmentación de los bosques también se pierde la conectividad entre las áreas, aspecto fundamental para el desplazamiento de las tropas. “La deforestación, con o sin permiso, sigue siendo un problema, porque le cortamos el movimiento a los monos”, advirtió el investigador. Por todo lo anterio, una posible solución es la creación de corredores biológicos y la protección de las cuencas hidrográficas para establecer la conectividad necesaria, lo que favorecería el crecimiento de las poblaciones y que así se produzcan cruces de individuos entre distintas tropas, según expresó Sánchez. Finalmente, Wong insiste en fomentar la educación ambiental para que la gente dé mayor importancia a la conservación de los monos y tome conciencia acerca de los servicios ambientales que brindan, entre estos el control de insectos y la dispersión de semilla y su valor para el turismo. (Universidad de Costa Rica,[La realidad de los monos](https://www.ucr.ac.cr/noticias/2019/05/08/la-realidad-de-los-monos-la-antesala-a-la-extincion.html)).
 
 # Tabla de Registros de presencia
-```{r Tabla-registros}
+```{r Tabla-registros, message=FALSE, warning=FALSE, echo=FALSE}
 # Tabla de registros de presencia
 primates_doc %>%
   st_drop_geometry() %>%
-  select(family, species, stateProvince, canton, eventDate) %>%
+  dplyr::select(family, species, stateProvince, canton, eventDate) %>%
   datatable(
-    colnames = c("Familia", "Especie", "Provincia", "Cantón", "Fecha"),
-    options = list(searchHighlight = TRUE)
+    colnames = c("Familia", "Especie", "Provincia", "Canton", "Fecha"),
+    options = list(
+      searchHighlight = TRUE,
+      language = list(url = '//cdn.datatables.net/plug-ins/
+1.10.11/i18n/Spanish.json'),
+      pageLength = 5
+    )
   )
 ```
 
+# Agregando una capa por cada tipo de mono
+```{r capa-mo_congo}
+# Creando Capa mono congo
+mo_congo <-
+  primates_doc %>%
+  filter(species == "Alouatta palliata")
+```
 
-# Gráfico de estacionalidad
+```{r capa-mo_ardilla}
+# Creando Capa mono ardilla
+mo_ardilla <-
+  primates_doc %>%
+  filter(species == "Saimiri oerstedii")
+```
 
-# Gráfico de historial
+```{r capa-mo_araña}
+# Creando Capa mono araña
+mo_arana <-
+  primates_doc %>%
+  filter(species == "Ateles geoffroyi")
+```
+
+```{r capa-mo_carablanca}
+# Creando Capa mono carablanca
+mo_carablanca <-
+  primates_doc %>%
+  filter(species == "Cebus capucinus")
+```
+
+
+# Gráfico
+```{r capa-Gra_pie, message=FALSE, warning=FALSE, echo=FALSE}
+Gra_pie <- 
+  data.frame("categorie"=rownames(primates_doc), primates_doc)
+data <- Gra_pie[, c('categorie', 'species', 'individualCount')]
+```
+
+```{r Grafico-Pastel, message=FALSE, warning=FALSE, echo=FALSE}
+plot_ly(
+  data, 
+  labels = ~species, 
+  values = ~individualCount, 
+  type = 'pie') %>%
+  config(locale = "es"
+  ) %>%
+layout(
+  title = 'Cantidad de Registros por especie y porcentaje que representan',
+  xaxis = list(
+    showgrid = FALSE, 
+    zeroline = FALSE, 
+    showticklabels = FALSE
+    ),
+  yaxis = list(
+    showgrid = FALSE, 
+    zeroline = FALSE, 
+    showticklabels = FALSE)
+  )
+```
+
+# Preparando datos para el mapa
+```{r Capa-Raster, message=FALSE, warning=FALSE}
+#Agregando capa Raster
+alt <- getData(
+  "worldclim",
+  var = "alt",
+  res = .5,
+  lon = -84,
+  lat = 10
+)
+```
+
+```{r Recorte-Capa, message=FALSE, warning=FALSE}
+# Recortando la capa de altitud para que se ajuste a los límites aproximados de Costa Rica.
+altitud <- crop(alt, extent(-86, -82.3, 8, 11.3))
+
+palet <- colorNumeric(
+  c("#FF80ED", "#AC25E2", "#800080"),
+  values(altitud)
+)
+```
+
 
 # Mapa de distribución
+```{r mapa, message=FALSE, warning=FALSE, echo=FALSE}
+# Mapa de registros de presencia
+primates_doc %>%
+  dplyr::select(stateProvince,
+         canton,
+         eventDate,
+         decimalLongitude,
+         decimalLatitude) %>%
+  leaflet() %>%
+  addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Stamen Toner Lite") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Imágenes de ESRI") %>%
+  addRasterImage(
+    altitud,
+    colors = palet,
+    opacity = 0.8,
+    group = "Altitud"
+  )%>%
+  addCircleMarkers(
+    data = mo_congo,
+    stroke = F,
+    radius = 3,
+    fillColor = 'blue',
+    fillOpacity = 1,
+    popup = paste(
+      primates_doc$stateProvince,
+      primates_doc$canton,
+      primates_doc$eventDate,
+      primates_doc$decimalLongitude,
+      primates_doc$decimalLatitude,
+      sep = '<br/>'
+    ),
+    group = "mo_congo"
+    ) %>%
+  addCircleMarkers(
+    data = mo_carablanca,
+    stroke = F,
+    radius = 3,
+    fillColor = 'orange',
+    fillOpacity = 1,
+    popup = paste(
+      primates_doc$stateProvince,
+      primates_doc$canton,
+      primates_doc$eventDate,
+      primates_doc$decimalLongitude,
+      primates_doc$decimalLatitude,
+      sep = '<br/>'
+    ),
+    group = "mo_carablanca"
+  ) %>%
+  addCircleMarkers(
+    data = mo_ardilla,
+    stroke = F,
+    radius = 3,
+    fillColor = 'green',
+    fillOpacity = 1,
+    popup = paste(
+      primates_doc$stateProvince,
+      primates_doc$canton,
+      primates_doc$eventDate,
+      primates_doc$decimalLongitude,
+      primates_doc$decimalLatitude,
+      sep = '<br/>'
+    ),
+    group = "mo_ardilla"
+  ) %>%
+  addCircleMarkers(
+    data = mo_arana,
+    stroke = F,
+    radius = 3,
+    fillColor = 'red',
+    fillOpacity = 1,
+    popup = paste(
+      primates_doc$stateProvince,
+      primates_doc$canton,
+      primates_doc$eventDate,
+      primates_doc$decimalLongitude,
+      primates_doc$decimalLatitude,
+      sep = '<br/>'
+    ),
+    group = "mo_arana"
+  ) %>%
+  addLayersControl(
+    baseGroups = c("OpenStreetMap", "Stamen Toner Lite", "Imágenes de ESRI"),
+    overlayGroups = c("mo_congo", "mo_carablanca", "mo_ardilla", "mo_arana", "Altitud")
+  ) %>%
+  addMiniMap(
+    tiles = providers$Stamen.OpenStreetMap.Mapnik,
+    position = "bottomleft",
+    toggleDisplay = TRUE
+  )
+```
 
