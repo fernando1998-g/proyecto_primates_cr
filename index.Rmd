@@ -169,6 +169,8 @@ primates_doc %>%
   dplyr::select(stateProvince,
          canton,
          eventDate,
+         family,
+         species,
          decimalLongitude,
          decimalLatitude) %>%
   leaflet() %>%
@@ -191,6 +193,8 @@ primates_doc %>%
       primates_doc$stateProvince,
       primates_doc$canton,
       primates_doc$eventDate,
+      primates_doc$family,
+      primates_doc$species,
       primates_doc$decimalLongitude,
       primates_doc$decimalLatitude,
       sep = '<br/>'
@@ -207,6 +211,8 @@ primates_doc %>%
       primates_doc$stateProvince,
       primates_doc$canton,
       primates_doc$eventDate,
+      primates_doc$family,
+      primates_doc$species,
       primates_doc$decimalLongitude,
       primates_doc$decimalLatitude,
       sep = '<br/>'
@@ -223,6 +229,8 @@ primates_doc %>%
       primates_doc$stateProvince,
       primates_doc$canton,
       primates_doc$eventDate,
+      primates_doc$family,
+      primates_doc$species,
       primates_doc$decimalLongitude,
       primates_doc$decimalLatitude,
       sep = '<br/>'
@@ -239,6 +247,8 @@ primates_doc %>%
       primates_doc$stateProvince,
       primates_doc$canton,
       primates_doc$eventDate,
+      primates_doc$family,
+      primates_doc$species,
       primates_doc$decimalLongitude,
       primates_doc$decimalLatitude,
       sep = '<br/>'
